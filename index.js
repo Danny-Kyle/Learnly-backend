@@ -29,7 +29,7 @@ mongoose.connection.on("connected", ()=> {
 app.use(express.json())
 app.use("/api/users", userRoute)
 app.use("/api/auth", authRoute)
-// app.use("/api/product", productRoute)
+app.use("/api/products", productRoute)
 
 app.listen(5000, ()=> {
     conn()
