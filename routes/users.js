@@ -1,5 +1,5 @@
 import express from "express";
-import {verifyTokenandAuthorization} from "../middleware/verifyToken.js";
+import {verifyTokenandAdmin, verifyTokenandAuthorization} from "../middleware/verifyToken.js";
 import User from "../models/User.js";
 import CryptoJS from "crypto-js";
 
@@ -27,5 +27,40 @@ router.put("/:id", verifyTokenandAuthorization, async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+// Delete User
+router.delete("/:id", verifyTokenandAdmin, async(req, res) =>{
+  try {
+    await User.findByIdAndDelete(req.params.id)
+    res.status(200).json("User deleted Successfully")
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
+
+// Get Single User
+router.get("/find/:id", async(req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+    const {password, ...others} = user._doc;
+    res.status(200).json(others) 
+    // res.status(200).json(`User ${user} found successfully`)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
+
+// Get All Users
+router.get("/", async(req, res) => {
+  const query = req.query.new
+  try {
+    const users = query ? await User.find().sort({_id:-1}).limit(5) : await User.find();
+    //if a query of {new=true}, is added to the request, it returns a maximum of 5 users
+    res.status(200).json(users); 
+    // res.status(200).json(`User ${user} found successfully`)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
 
 export default router;

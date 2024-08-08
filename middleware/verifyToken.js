@@ -22,8 +22,17 @@ const verifyTokenandAuthorization = (req, res, next)=>{
         }else{
             res.status(403).json("You aren't authorized to do that")
         }
-    })
-    
+    }) 
+}
+const verifyTokenandAdmin = (req, res, next)=>{
+    verifyToken(req, res, ()=>{
+        if(req.user.isAdmin){
+            next();
+            // if user Id = params id or if user is certified as an admin, continue
+        }else{
+            res.status(403).json("You aren't authorized to do that")
+        }
+    }) 
 }
 
-export { verifyToken, verifyTokenandAuthorization };
+export { verifyToken, verifyTokenandAuthorization, verifyTokenandAdmin };
