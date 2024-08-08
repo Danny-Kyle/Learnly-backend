@@ -53,18 +53,28 @@ router.get("/find/:id", async(req, res) => {
   }
 })
 
-// // Get All Users
-// router.get("/", async(req, res) => {
-//   const query = req.query.new
-//   try {
-//     const users = query ? await User.find().sort({_id:-1}).limit(5) : await User.find();
-//     //if a query of {new=true}, is added to the request, it returns a maximum of 5 users
-//     res.status(200).json(users); 
-//     // res.status(200).json(`User ${user} found successfully`)
-//   } catch (error) {
-//     res.status(500).json(error)
-//   }
-// })
+// Get All Products
+router.get("/", async(req, res) => {
+  const qNew = req.query.new; //if a query of {qNew=true}, is added to the request, it returns a limited number products
+  const qCategory = req.query.category; //if a query of {qCategory=true}, is added to the request, it returns only products in a certain category
+  try {
+    let products;
+    if(qNew){
+        products = await Product.find().sort({createdAt:-1}).limit(5)
+    }else if(qCategory){
+        products = await Product.find().sort({categories:{
+            $in: [qCategory]
+        }})
+    }else {
+        products = await Product.find()
+    }
+
+
+    res.status(200).json(users); 
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
 
 // //Get User's status
 // router.get("/stats", verifyTokenandAdmin, async(req, res) =>{
