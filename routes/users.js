@@ -39,7 +39,7 @@ router.delete("/:id", verifyTokenandAuthorization, async(req, res) =>{
 })
 
 // Get Single User
-router.get("/find/:id", async(req, res) => {
+router.get("/find/:id", verifyTokenandAdmin, async(req, res) => {
   try {
     const user = await User.findById(req.params.id)
     const {password, ...others} = user._doc;
@@ -51,7 +51,7 @@ router.get("/find/:id", async(req, res) => {
 })
 
 // Get All Users
-router.get("/", async(req, res) => {
+router.get("/", verifyTokenandAdmin, async(req, res) => {
   const query = req.query.new
   try {
     const users = query ? await User.find().sort({_id:-1}).limit(5) : await User.find();
