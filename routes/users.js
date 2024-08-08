@@ -29,7 +29,7 @@ router.put("/:id", verifyTokenandAuthorization, async (req, res) => {
 });
 
 // Delete User
-router.delete("/:id", verifyTokenandAdmin, async(req, res) =>{
+router.delete("/:id", verifyTokenandAuthorization, async(req, res) =>{
   try {
     await User.findByIdAndDelete(req.params.id)
     res.status(200).json("User deleted Successfully")

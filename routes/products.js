@@ -33,27 +33,25 @@ router.put("/:id", verifyTokenandAdmin, async (req, res) => {
   }
 });
 
-// // Delete User
-// router.delete("/:id", verifyTokenandAdmin, async(req, res) =>{
-//   try {
-//     await User.findByIdAndDelete(req.params.id)
-//     res.status(200).json("User deleted Successfully")
-//   } catch (error) {
-//     res.status(500).json(error)
-//   }
-// })
+// Delete Product
+router.delete("/:id", verifyTokenandAdmin, async(req, res) =>{
+  try {
+    await Product.findByIdAndDelete(req.params.id)
+    res.status(200).json("Product deleted Successfully")
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
 
-// // Get Single User
-// router.get("/find/:id", async(req, res) => {
-//   try {
-//     const user = await User.findById(req.params.id)
-//     const {password, ...others} = user._doc;
-//     res.status(200).json(others) 
-//     // res.status(200).json(`User ${user} found successfully`)
-//   } catch (error) {
-//     res.status(500).json(error)
-//   }
-// })
+// Get Single Product
+router.get("/find/:id", async(req, res) => {
+  try {
+    const product = await Product.findById(req.params.id)
+    res.status(200).json(product) 
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
 
 // // Get All Users
 // router.get("/", async(req, res) => {
