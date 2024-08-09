@@ -91,6 +91,33 @@ The Learnly App backend uses MongoDB as its database, with the following schema:
 - `isAdmin`: Boolean, default: false
 - `timestamps`: true
 
+## Authentication Mechanism
+
+The Learnly App backend uses JSON Web Tokens (JWT) for authentication. The authentication mechanism is based on Role-Based Access Control (RBAC).
+
+## Error Handling
+
+The Learnly App backend uses try-catch blocks for error handling.
+
 ## Deployment
 
-The Learnly App backend is deployed on Render.com and can be accessed at `https://learnly-backend-dam0.onrender.com`.
+The Learnly App backend is deployed on Render.com.
+
+## Code Structure
+
+The Learnly App backend code structure is as follows:
+
+- `.env`: Environment variables
+- `.git`: Git repository
+- `controllers`: Controller files
+- `generateStructure.js`: Script to generate the project structure
+- `index.js`: Main application file
+- `middleware`: Middleware files
+- `models`: Model files
+- `package-lock.json`: Package lock file
+- `package.json`: Package file
+- `README.md`: README file
+- `routes`: Route files
+- `services`: Service files
+- `utils`: Utility files
+- `views`: View files
