@@ -15,6 +15,7 @@ const ProductSchema = new Schema({
   price: {
     type: Number,
     required: true,
+    min: 0
   },
   img: {
     type: String,
@@ -29,6 +30,11 @@ const ProductSchema = new Schema({
   color: {
     type: String,
   },
+  createdBy:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
 });
 
 export default mongoose.model("Product", ProductSchema);

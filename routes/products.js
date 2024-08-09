@@ -4,12 +4,14 @@ import {
   verifyTokenandAuthorization,
 } from "../middleware/verifyToken.js";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 
 const router = express.Router();
 
 // To create a Product
 router.post("/", verifyTokenandAdmin, async (req, res) => {
-  const newProduct = new Product(req.body);
+  const userId = req.user.id
+  const newProduct = new Product({...req.body, createdBy: userId});
 
   try {
     const savedProduct = await newProduct.save();
