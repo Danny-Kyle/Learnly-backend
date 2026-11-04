@@ -5,18 +5,43 @@ import {
   verifyTokenandAuthorization,
 } from "../middleware/verifyToken.js";
 import Order from "../models/Order.js";
+import Product from "../models/Product.js";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
 // To create an Order
 router.post("/", verifyToken, async (req, res) => {
-  const newOrder = new Order(req.body);
+  const { products, address } = req.body ?? {};
+  if (!Array.isArray(products) || products.length === 0 || products.length > 100 ||
+      typeof address?.line !== "string" || !address.line.trim() || address.line.length > 500 ||
+      !products.every((item) => mongoose.isObjectIdOrHexString(item?.productId) &&
+        Number.isInteger(item.quantity) && item.quantity >= 1 && item.quantity <= 100)) {
+    return res.status(400).json("Provide valid items, quantities and a delivery address.");
+  }
+
+  const quantities = new Map();
+  for (const { productId, quantity } of products) {
+    const id = productId.toLowerCase();
+    quantities.set(id, (quantities.get(id) ?? 0) + quantity);
+  }
+  if ([...quantities.values()].some((quantity) => quantity > 100)) return res.sendStatus(400);
 
   try {
-    const savedOrder = await newOrder.save();
-    res.status(200).json(savedOrder);
-  } catch (error) {
-    res.status(500).json(error);
+    const catalog = await Product.find({ _id: { $in: [...quantities.keys()] } }).select("price");
+    if (catalog.length !== quantities.size) return res.status(400).json("Product unavailable.");
+
+    const amount = catalog.reduce((total, product) =>
+      total + Math.round(product.price * 100) * quantities.get(String(product._id)), 0) / 100;
+    const order = await Order.create({
+      userId: req.user.id,
+      products: [...quantities].map(([productId, quantity]) => ({ productId, quantity })),
+      amount,
+      address: { line: address.line.trim() },
+    });
+    res.status(201).json(order);
+  } catch {
+    res.sendStatus(500);
   }
 });
 

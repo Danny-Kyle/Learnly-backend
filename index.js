@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import "dotenv/config";
 import userRoute from "./routes/users.js";
 import authRoute from "./routes/auth.js";
 import productRoute from "./routes/products.js";
@@ -8,8 +8,8 @@ import cartRoute from "./routes/cart.js";
 import orderRoute from "./routes/order.js";
 import cors from 'cors'
 const app = express();
-const port = 5000;
-dotenv.config();
+const port = process.env.PORT || 5000;
+
 
 const conn = async () => {
   try {
@@ -35,7 +35,7 @@ app.use("/api/products", productRoute);
 app.use("/api/carts", cartRoute);
 app.use("/api/orders", orderRoute);
 
-app.listen(5000, () => {
-  conn();
+await conn();
+app.listen(port, () => {
   console.log("Connected to backend!!!");
 });

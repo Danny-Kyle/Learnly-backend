@@ -1,22 +1,22 @@
 import jwt from "jsonwebtoken";
 
 const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.token;
-  if (authHeader) {
-    const token = authHeader.split(" ")[1];
-    jwt.verify(token, process.env.JWT_SECRET, (error, user) => {
-      if (error) res.status(403).json("Invalid Token!");
-      req.user = user;
-      next();
-    });
-  } else {
-    return res.status(401).json("You aren't yet authenticated!!");
+  const header = req.headers.authorization ?? req.headers.token;
+  const match = typeof header === "string" && /^Bearer ([^\s]+)$/i.exec(header);
+  if (!match) return res.status(401).json("Authentication required");
+
+  try {
+    req.user = jwt.verify(match[1], process.env.JWT_SECRET, { algorithms: ["HS256"] });
+  } catch {
+    return res.status(403).json("Invalid token");
   }
+
+  next();
 };
 
 const verifyTokenandAuthorization = (req, res, next) => {
   verifyToken(req, res, () => {
-    if (req.user.id === req.params.id || req.user.isAdmin) {
+    if (req.user.id === (req.params.id ?? req.params.userId) || req.user.isAdmin) {
       next();
       // if user Id = params id or if user is certified as an admin, continue
     } else {

@@ -7,26 +7,34 @@ const router = express.Router();
 
 //REGISTER
 router.post("/register", async (req, res) => {
+  const { username, email, password: plaintext } = req.body ?? {};
+  if (![username, email, plaintext].every((value) => typeof value === "string" && value.trim())) {
+    return res.status(400).json("Username, email and password are required");
+  }
   const newUser = new User({
     username: req.body.username,
     email: req.body.email,
     password: CryptoJS.AES.encrypt(
-      req.body.password,
+      plaintext,
       process.env.PASS_SEC
     ).toString(),
   });
   try {
     const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
+    const { password, ...account } = savedUser.toObject();
+    res.status(201).json(account);
   } catch (error) {
-    res.status(500).json(error);
+    if (error.code === 11000) return res.status(409).json("Username or email already exists");
+    res.sendStatus(500);
   }
 });
 
 //LOGIN
 router.post("/login", async (req, res) => {
+  const { username, password: plaintext } = req.body ?? {};
+  if (typeof username !== "string" || typeof plaintext !== "string") return res.sendStatus(400);
   try {
-    const user = await User.findOne({ username: req.body.username });
+    const user = await User.findOne({ username });
     if (!user){
       return res.status(401).json("Wrong Username Credentials");
     }
@@ -35,7 +43,7 @@ router.post("/login", async (req, res) => {
       process.env.PASS_SEC
     );
     const OriginalPassword = hashedpassword.toString(CryptoJS.enc.Utf8);
-    if (OriginalPassword !== req.body.password){
+    if (OriginalPassword !== plaintext){
       return res.status(401).json("Wrong Password Entered!");
     }
 
@@ -54,7 +62,7 @@ router.post("/login", async (req, res) => {
     const { password, ...others } = user._doc;
     res.status(200).json({ ...others, accessToken });
   } catch (error) {
-    res.status(500).json(error);
+    res.sendStatus(500);
   }
 });
 
